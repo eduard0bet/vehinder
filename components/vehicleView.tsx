@@ -79,7 +79,7 @@ export default function VehiclesView({ role, token }: VehiclesViewProps) {
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [limit] = useState(24)
+  const [limit] = useState(12)
   const [query, setQuery] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)

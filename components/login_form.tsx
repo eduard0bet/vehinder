@@ -28,11 +28,12 @@ export default function LoginPage() {
       password: "",
     },
   })
+  const apiUrl = process.env.NEXT_PUBLIC_CARFNDR_API_URL
 
   const handleLogin = async (values: { email: string; password: string }) => {
     setLoading(true)
     try {
-      const res = await fetch("http://localhost:3091/v1/login", {
+      const res = await fetch(`${apiUrl}/v1/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
