@@ -25,7 +25,7 @@ const components = [
   },
   {
     title: "Brands",
-    href: "/dashboard/brands",
+    href: "/dashboard/makes",
     description: "Create and manage vehicle brands.",
   },
   {

@@ -170,8 +170,7 @@ export function VehicleFinder() {
 
   return (
     <>
-      <Card className="border-2 shadow-xl">
-        <CardContent className="p-4">
+
           <div className="flex flex-col items-center justify-between gap-2 md:flex-row">
             <div className="w-full md:grow">
               {loadingYears ? (
@@ -280,8 +279,7 @@ export function VehicleFinder() {
               </>
             )}
           </div>
-        </CardContent>
-      </Card>
+      
     </>
   )
 }

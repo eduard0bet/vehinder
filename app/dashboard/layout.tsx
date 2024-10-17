@@ -23,6 +23,7 @@ export default function DashboardLayout({
   }
 
   return (
+    <>
     <section className="container grid items-center pb-8 md:py-4 gap-3">
       <Card>
         <DashboardNav />
@@ -31,5 +32,6 @@ export default function DashboardLayout({
         <CardContent className="p-4">{children}</CardContent>
       </Card>
     </section>
+  </>
   )
 }

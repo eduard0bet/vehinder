@@ -1,4 +1,4 @@
-// @/components/yearsView.tsx
+// @/components/makesView.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -33,9 +33,9 @@ import {
 
 const apiUrl = process.env.NEXT_PUBLIC_CARFNDR_API_URL
 
-async function fetchYears(page: number, limit: number, token: string) {
+async function fetchMakes(page: number, limit: number, token: string) {
   const response = await fetch(
-    `${apiUrl}/yearsList?page=${page}&limit=${limit}`,
+    `${apiUrl}/makesList?page=${page}&limit=${limit}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -53,106 +53,111 @@ async function fetchYears(page: number, limit: number, token: string) {
   return data
 }
 
-async function createYear(year: number, token: string) {
-  const response = await fetch(`${apiUrl}/create-year`, {
+async function createMake(make: string, token: string) {
+  const response = await fetch(`${apiUrl}/create-make`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ year }),
+    body: JSON.stringify({ make }),
   })
 
   const data = await response.json()
   return data
 }
+
 interface Year {
   id: number
-  year: number
+  make: string
 }
+
 interface YearsViewProps {
   role: string // User role
   token: string // Authentication token
 }
 
 export default function YearsView({ role, token }: YearsViewProps) {
-  const [years, setYears] = useState<Year[]>([])
+  const [makes, setMakes] = useState<Year[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [limit] = useState(12)
-  const [newYear, setNewYear] = useState("")
+  const [newMake, setNewMake] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
-    const getYears = async () => {
+    const getMakes = async () => {
       try {
-        const data = await fetchYears(currentPage, limit, token)
-        setYears(data.items)
+        const data = await fetchMakes(currentPage, limit, token)
+        setMakes(data.items)
         setTotalPages(data.totalPages)
-      } catch (error) {}
+      } catch (error) {
+        console.error(error)
+      }
     }
 
-    getYears()
+    getMakes()
   }, [currentPage, limit, token])
 
-  const handleCreateYear = async () => {
-    if (!newYear || isNaN(Number(newYear))) {
-      setErrorMessage("Please enter a valid year.")
+  const handleCreateMake = async () => {
+    if (!newMake.trim()) {
+      setErrorMessage("Please enter a brand name.")
       return
     }
 
     try {
-      const result = await createYear(Number(newYear), token)
+      const result = await createMake(newMake, token)
       if (result.error) {
         setErrorMessage(result.error)
       } else {
         setErrorMessage("")
-        const updatedYears = [...years, result.year]
-        updatedYears.sort((a, b) => b.year - a.year)
-        setYears(updatedYears)
-        setNewYear("")
-        setIsDialogOpen(false)
+        const updatedMakes = [...makes, result.make]
+        updatedMakes.sort((a, b) => b.make.localeCompare(a.make)) // Ordenar alfabéticamente
+        setMakes(updatedMakes)
+        setNewMake("")
+        setIsDialogOpen(false) // Cierra el diálogo
         toast({
-          description: "Year successfully added.",
+          description: "Brand successfully added.", // Muestra el toast
         })
       }
     } catch (error) {
-      console.error("Error creating year:", error)
-      setErrorMessage("Failed to create year.")
+      console.error("Error creating Brand:", error)
+      setErrorMessage("Failed to create Brand.")
     }
   }
 
   return (
     <div>
       <div className="flex justify-between">
-        <div className="pb-4 text-xl">Years</div>
+        <div className="pb-4 text-xl">Brands</div>
         <div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger>
               <Button size="sm">Add</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add Year</DialogTitle>
+                <DialogTitle>Add Brand</DialogTitle>
               </DialogHeader>
               <DialogDescription>
-                Enter a new year to add to the system.
+                Enter a new brand to add to the system.
               </DialogDescription>
               <Input
-                type="number"
-                placeholder="Enter the year"
-                value={newYear}
-                onChange={(e) => setNewYear(e.target.value)}
+                type="text" // Permitir solo texto
+                placeholder="Enter the brand name"
+                value={newMake}
+                onChange={(e) => setNewMake(e.target.value)}
               />
               {errorMessage && (
                 <p className="text-sm text-red-400">{errorMessage}</p>
               )}
               <DialogFooter>
-                <Button onClick={handleCreateYear}>Save Year</Button>
+                <Button onClick={handleCreateMake}>Create Brand</Button>
               </DialogFooter>
             </DialogContent>
-          </Dialog></div>
+          </Dialog>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
@@ -160,15 +165,15 @@ export default function YearsView({ role, token }: YearsViewProps) {
           <TableHeader>
             <TableRow>
               <TableHead className="w-20">ID</TableHead>
-              <TableHead>Year</TableHead>
+              <TableHead>Brand</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {years?.length > 0 ? (
-              years.map((year) => (
-                <TableRow key={year.id}>
-                  <TableCell>{year.id}</TableCell>
-                  <TableCell>{year.year}</TableCell>
+            {makes?.length > 0 ? (
+              makes.map((make) => (
+                <TableRow key={make.id}>
+                  <TableCell>{make.id}</TableCell>
+                  <TableCell>{make.make}</TableCell>
                 </TableRow>
               ))
             ) : (
