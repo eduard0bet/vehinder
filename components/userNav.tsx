@@ -1,26 +1,17 @@
-"use client";
-
-import { useEffect } from "react";
+// components/UserNav.tsx
+"use client"
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import LogoutButton from "@/components/LogoutButton";
 import { useAuth } from "@/context/AuthContext";
 
+import { Button } from "@/components/ui/button";
+import LogoutButton from "@/components/LogoutButton";
+
 export default function UserNav() {
-  const { isLoggedIn, role } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth();
 
-  useEffect(() => {
-    const handleAuthChange = () => {
-      // Re-trigger a re-render by using the auth context directly
-      // Context should already handle the state changes, so we rely on it
-    };
-
-    window.addEventListener("authChange", handleAuthChange);
-
-    return () => {
-      window.removeEventListener("authChange", handleAuthChange);
-    };
-  }, []);
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <div className="flex justify-between gap-1">
@@ -37,7 +28,7 @@ export default function UserNav() {
         <Button
           size="sm"
           variant="ghost"
-          onClick={() => window.location.href = "/auth/login"}
+          onClick={() => (window.location.href = "/auth/login")}
           className="w-full"
         >
           Login

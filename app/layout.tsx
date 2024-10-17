@@ -1,14 +1,13 @@
+// app/layout.tsx
 import "@/styles/globals.css"
 import { Metadata } from "next"
-
+import { AuthProvider } from "@/context/AuthContext"
 import { siteConfig } from "@/config/site"
 import { fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
-import { Toaster } from "@/components/ui/toaster"
 import { SiteHeader } from "@/components/site-header"
-import { TailwindIndicator } from "@/components/tailwind-indicator"
 import { ThemeProvider } from "@/components/theme-provider"
-import { AuthProvider } from "@/context/AuthContext";
+
 
 export const metadata: Metadata = {
   title: {
@@ -27,16 +26,14 @@ export const metadata: Metadata = {
   },
 }
 
-interface RootLayoutProps {
+export default function RootLayout({
+  children,
+}: {
   children: React.ReactNode
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
+}) {
   return (
-    <>
-    <AuthProvider>
-      <html lang="en" suppressHydrationWarning>
-        <head />
+    <html lang="es">
+      <AuthProvider>
         <body
           className={cn(
             "min-h-screen bg-background font-sans antialiased",
@@ -46,13 +43,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="relative flex min-h-screen flex-col">
               <SiteHeader />
-              <div className="flex-1">{children}</div>
+              {children}
             </div>
           </ThemeProvider>
-          <Toaster />
         </body>
-      </html>
-    </AuthProvider>
-    </>
+      </AuthProvider>
+    </html>
   )
 }

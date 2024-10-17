@@ -38,7 +38,7 @@ export default function Dashboard() {
   }, [router]);
 
   if (!role) {
-    return <p>Cargando...</p>; // Puedes mostrar un loader mientras se carga el estado
+    return null;
   }
 
   return <DashboardClient role={role} />;

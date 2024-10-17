@@ -2,16 +2,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-
 import { toast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -52,20 +44,17 @@ async function fetchYears(page: number, limit: number, token: string) {
     }
   )
 
-  console.log("Response status:", response.status)
-
   if (!response.ok) {
     const errorDetails = await response.text()
     console.error("Fetch error details:", errorDetails)
     throw new Error(`Error fetching data: ${response.status} - ${errorDetails}`)
   }
-
   const data = await response.json()
   return data
 }
 
 async function createYear(year: number, token: string) {
-  const response = await fetch(`${apiUrl}/v1/create-year`, {
+  const response = await fetch(`${apiUrl}/create-year`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -77,12 +66,10 @@ async function createYear(year: number, token: string) {
   const data = await response.json()
   return data
 }
-
 interface Year {
   id: number
   year: number
 }
-
 interface YearsViewProps {
   role: string // User role
   token: string // Authentication token
@@ -116,7 +103,6 @@ export default function YearsView({ role, token }: YearsViewProps) {
     }
 
     try {
-      console.log("Creating year with token:", token)
       const result = await createYear(Number(newYear), token)
       if (result.error) {
         setErrorMessage(result.error)
@@ -141,12 +127,12 @@ export default function YearsView({ role, token }: YearsViewProps) {
     <div>
       <div className="flex justify-between">
         <div className="pb-4 text-xl">Years</div>
-        {role === "admin" && (
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
+        <div>
+          <Dialog>
+            <DialogTrigger>
               <Button size="sm">Add</Button>
             </DialogTrigger>
-            <DialogContent className="min-w-fit">
+            <DialogContent>
               <DialogHeader>
                 <DialogTitle>Add Year</DialogTitle>
               </DialogHeader>
@@ -166,8 +152,7 @@ export default function YearsView({ role, token }: YearsViewProps) {
                 <Button onClick={handleCreateYear}>Save Year</Button>
               </DialogFooter>
             </DialogContent>
-          </Dialog>
-        )}
+          </Dialog></div>
       </div>
 
       <div className="overflow-x-auto">

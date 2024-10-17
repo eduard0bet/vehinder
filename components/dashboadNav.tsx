@@ -15,8 +15,9 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
+import { Skeleton } from "@/components/ui/skeleton"
 
-const components: { title: string; href: string; description: string }[] = [
+const components = [
   {
     title: "Years",
     href: "/dashboard/years",
@@ -35,7 +36,7 @@ const components: { title: string; href: string; description: string }[] = [
   {
     title: "Cylinders",
     href: "/dashboard/cylinders",
-    description: "Edit and manage the en gines cylinders.",
+    description: "Edit and manage the engine cylinders.",
   },
   {
     title: "Displacement",
@@ -45,7 +46,7 @@ const components: { title: string; href: string; description: string }[] = [
   {
     title: "Transmission",
     href: "/dashboard/transmission",
-    description: "Manage and create transmitions.",
+    description: "Manage and create transmissions.",
   },
   {
     title: "Drives",
@@ -55,7 +56,7 @@ const components: { title: string; href: string; description: string }[] = [
   {
     title: "Trims",
     href: "/dashboard/trims",
-    description: "Define vehicle trims before create a vehicle.",
+    description: "Define vehicle trims before creating a vehicle.",
   },
 ]
 
@@ -75,6 +76,7 @@ function decodeJWT(token: string) {
 export function DashboardNav() {
   const router = useRouter()
   const [role, setRole] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const token = Cookies.get("token")
@@ -93,19 +95,33 @@ export function DashboardNav() {
         // Handle errors in decoding, e.g., if the token is malformed
         Cookies.remove("token")
         router.push("/auth/login")
+      } finally {
+        setIsLoading(false)
       }
     } else {
       router.push("/auth/login")
     }
   }, [router])
 
+  // Show a Skeleton while the role is being determined
+  if (isLoading) {
+    return <Skeleton className="h-10 mx-2" />
+  }
+
   if (!role) {
-    return null // Show nothing while determining the role
+    return null
   }
 
   return (
     <NavigationMenu>
       <NavigationMenuList>
+      <NavigationMenuItem>
+              <Link href="/dashboard" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Dashboard
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
         {/* Show the Vehicles link only if the user has the role "admin" */}
         {role === "admin" && (
           <>
@@ -137,27 +153,27 @@ export function DashboardNav() {
         )}
         {role === "client" && (
           <>
-          <NavigationMenuItem>
-            <Link href="/dashboard/apikey" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                ApiKey
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/dashboard/billing" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Billing
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/dashboard/billing" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Settings
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/dashboard/apikey" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  ApiKey
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/dashboard/billing" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Billing
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/dashboard/settings" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Settings
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
           </>
         )}
       </NavigationMenuList>

@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Form, FormField, FormItem, FormControl, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-
-import Cookies from "js-cookie"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Form, FormField, FormItem, FormControl, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext"; // Importa el contexto de autenticación
 
 // Esquema de validación de Zod
 const loginSchema = z.object({
   email: z.string().email("Correo inválido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-})
+});
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const { login } = useAuth(); // Obtén el método login del contexto
+  const [loading, setLoading] = useState(false);
 
   // Inicializar el formulario con react-hook-form y zod
   const form = useForm({
@@ -28,38 +28,35 @@ export default function LoginPage() {
       email: "",
       password: "",
     },
-  })
-  const apiUrl = process.env.NEXT_PUBLIC_CARFNDR_API_URL
+  });
+  const apiUrl = process.env.NEXT_PUBLIC_CARFNDR_API_URL;
 
   const handleLogin = async (values: { email: string; password: string }) => {
-    
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await fetch(`${apiUrl}/v1/login`, {
+      const res = await fetch(`${apiUrl}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
-      })
-
-      const data = await res.json()
-
+      });
+  
+      const data = await res.json();
+  
       if (res.ok) {
-        // Guardar el token en cookies (para que middleware pueda acceder)
-        Cookies.set("token", data.token, { expires: 1 }) // 1 día de expiración
-
-        // Redirigir al dashboard
-        router.push("/dashboard")
+        login(data.token);
+        router.push("/dashboard");
       } else {
-        console.error("Error en el login:", data.error || "Credenciales inválidas")
+        console.error("Error en el login:", data.error || "Credenciales inválidas");
       }
     } catch (error) {
-      console.error("Error del servidor:", error)
+      console.error("Error del servidor:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+  
 
   return (
     <div className="flex h-screen items-center justify-center">
@@ -107,5 +104,5 @@ export default function LoginPage() {
         </form>
       </Form>
     </div>
-  )
+  );
 }

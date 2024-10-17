@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import YearsView from "@/components/yearsView";
 
@@ -46,11 +47,9 @@ export default function YearsPage() {
     }
   }, [router]);
 
-  // Display a loading state while determining the role and token
   if (!role || !token) {
-    return <div>Loading...</div>;
+    return null;
   }
 
-  // Only render the YearsView component if the role is "admin"
   return role === "admin" ? <YearsView role={role} token={token} /> : null;
 }

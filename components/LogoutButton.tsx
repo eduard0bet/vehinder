@@ -1,19 +1,17 @@
 // components/LogoutButton.tsx
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation'; // Importa useRouter
 
 export default function LogoutButton() {
-  const router = useRouter();
+  const { logout } = useAuth();
+  const router = useRouter(); // Usa useRouter
 
   const handleLogout = () => {
-    // Elimina el token de las cookies
-    Cookies.remove("token");
-
-    // Redirige al usuario a la página de inicio de sesión o a la página principal
-    router.push("/auth/login");
+    logout();
+    router.push('/auth/login'); // Redirige al login
   };
 
   return (

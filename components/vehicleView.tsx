@@ -113,10 +113,10 @@ export default function VehiclesView({ role, token }: VehiclesViewProps) {
 
   return (
     <div>
-      <div className="pb-4 text-xl">
-        Vehicles
-      </div>
       <div className="flex gap-2">
+        <div className="mt-1 text-xl md:mr-6">
+        Vehicles
+        </div>
         <Input
           type="text"
           placeholder="Search by make, model, year..."
