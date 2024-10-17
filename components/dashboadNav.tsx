@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import Cookies from "js-cookie"
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
+import Cookies from "js-cookie";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -14,8 +14,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@/components/ui/navigation-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const components = [
   {
@@ -58,76 +58,87 @@ const components = [
     href: "/dashboard/trims",
     description: "Define vehicle trims before creating a vehicle.",
   },
-]
+];
 
 // Manual function to decode the JWT token
 function decodeJWT(token: string) {
-  const base64Url = token.split(".")[1]
-  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+  const base64Url = token.split(".")[1];
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
   const jsonPayload = decodeURIComponent(
     atob(base64)
       .split("")
       .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
       .join("")
-  )
-  return JSON.parse(jsonPayload)
+  );
+  return JSON.parse(jsonPayload);
 }
 
 export function DashboardNav() {
-  const router = useRouter()
-  const [role, setRole] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter();
+  const pathname = usePathname(); // Get the current path
+  const [role, setRole] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = Cookies.get("token")
+    const token = Cookies.get("token");
 
     if (token) {
       try {
-        const decoded = decodeJWT(token)
-        setRole(decoded.role)
+        const decoded = decodeJWT(token);
+        setRole(decoded.role);
 
         // If token is expired or role is invalid, redirect to login
         if (!decoded.role || decoded.exp * 1000 < Date.now()) {
-          Cookies.remove("token")
-          router.push("/auth/login")
+          Cookies.remove("token");
+          router.push("/auth/login");
         }
       } catch {
-        // Handle errors in decoding, e.g., if the token is malformed
-        Cookies.remove("token")
-        router.push("/auth/login")
+        Cookies.remove("token");
+        router.push("/auth/login");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     } else {
-      router.push("/auth/login")
+      router.push("/auth/login");
     }
-  }, [router])
+  }, [router]);
 
-  // Show a Skeleton while the role is being determined
   if (isLoading) {
-    return <Skeleton className="h-10 mx-2" />
+    return <Skeleton className="h-10 mx-2" />;
   }
 
   if (!role) {
-    return null
+    return null;
   }
+
+  const isActive = (href: string) => pathname === href;
 
   return (
     <NavigationMenu>
       <NavigationMenuList>
-      <NavigationMenuItem>
-              <Link href="/dashboard" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Dashboard
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
+        <NavigationMenuItem>
+          <Link href="/dashboard" legacyBehavior passHref>
+            <NavigationMenuLink
+              className={cn(
+                navigationMenuTriggerStyle(),
+                isActive("/dashboard") && "bg-accent text-accent-foreground"
+              )}
+            >
+              Dashboard
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
         {/* Show the Vehicles link only if the user has the role "admin" */}
         {role === "admin" && (
           <>
             <NavigationMenuItem>
               <Link href="/dashboard/vehicles" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    isActive("/dashboard/vehicles") && "bg-accent text-accent-foreground"
+                  )}
+                >
                   Vehicles
                 </NavigationMenuLink>
               </Link>
@@ -142,6 +153,7 @@ export function DashboardNav() {
                       key={component.title}
                       title={component.title}
                       href={component.href}
+                      isActive={isActive(component.href)}
                     >
                       {component.description}
                     </ListItem>
@@ -155,21 +167,36 @@ export function DashboardNav() {
           <>
             <NavigationMenuItem>
               <Link href="/dashboard/apikey" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    isActive("/dashboard/apikey") && "bg-accent text-accent-foreground"
+                  )}
+                >
                   ApiKey
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <Link href="/dashboard/billing" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    isActive("/dashboard/billing") && "bg-accent text-accent-foreground"
+                  )}
+                >
                   Billing
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <Link href="/dashboard/settings" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    isActive("/dashboard/settings") && "bg-accent text-accent-foreground"
+                  )}
+                >
                   Settings
                 </NavigationMenuLink>
               </Link>
@@ -178,23 +205,25 @@ export function DashboardNav() {
         )}
       </NavigationMenuList>
     </NavigationMenu>
-  )
+  );
 }
 
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<typeof Link> & {
-    title: string
-    className?: string
+    title: string;
+    isActive: boolean;
+    className?: string;
   }
->(({ className, title, children, ...props }, ref) => {
+>(({ className, title, children, isActive, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink>
         <Link
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors",
+            isActive ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground",
             className
           )}
           {...props}
@@ -206,7 +235,7 @@ const ListItem = React.forwardRef<
         </Link>
       </NavigationMenuLink>
     </li>
-  )
-})
+  );
+});
 
-ListItem.displayName = "ListItem"
+ListItem.displayName = "ListItem";
