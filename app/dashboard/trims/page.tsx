@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import CylindersView from "@/components/cylindersView";
+import TrimsView from "@/components/trimsView";
 
-export default function CilindersPage() {
+export default function TrimsPage() {
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -49,5 +49,5 @@ export default function CilindersPage() {
     return null;
   }
 
-  return role === "admin" ? <CylindersView role={role} token={token} /> : null;
+  return role === "admin" ? <TrimsView role={role} token={token} /> : null;
 }

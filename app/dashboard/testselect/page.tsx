@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import CylindersView from "@/components/cylindersView";
+import TestCombobox from "@/components/selectModels"; // Actualizamos la importación al nuevo componente
+import SelectTrims from "@/components/selectTrims";
 
 export default function CilindersPage() {
   const router = useRouter();
@@ -45,9 +46,20 @@ export default function CilindersPage() {
     }
   }, [router]);
 
-  if (!role || !token) {
-    return null;
-  }
+  const handleTrimSelect = (trimId: number | null, trimName: string) => {
+    console.log(`Selected Trim ID: ${trimId}, Selected Trim Name: ${trimName}`);
+  };
 
-  return role === "admin" ? <CylindersView role={role} token={token} /> : null;
+  return (
+    <>
+      {token ? (
+        <SelectTrims 
+          token={token} 
+          onTrimselect={(trimId, trimName) => handleTrimSelect(trimId, trimName)} 
+        />
+      ) : (
+        <p>Loading...</p>
+      )}
+    </>
+  );
 }

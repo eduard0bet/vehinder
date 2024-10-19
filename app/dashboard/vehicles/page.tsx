@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 
 import VehicleView from "@/components/vehicleView";
 
-export default function YearsPage() {
+export default function VehiclesPage() {
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -47,7 +47,7 @@ export default function YearsPage() {
   }, [router]);
 
   if (!role || !token) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   return role === "admin" ? <VehicleView role={role} token={token} /> : null;

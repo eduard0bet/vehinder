@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import ModelsView from "@/components/modelView";
 
-export default function YearsPage() {
+export default function ModelsPage() {
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);

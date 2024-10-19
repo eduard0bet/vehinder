@@ -21,7 +21,7 @@ const components = [
   {
     title: "Years",
     href: "/dashboard/years",
-    description: "Add, remove or edit vehicles fabrication years.",
+    description: "Manage or edit vehicles fabrication years.",
   },
   {
     title: "Brands",
@@ -40,12 +40,12 @@ const components = [
   },
   {
     title: "Displacement",
-    href: "/dashboard/displacement",
+    href: "/dashboard/displacements",
     description: "Edit and create engines displacements.",
   },
   {
     title: "Transmission",
-    href: "/dashboard/transmission",
+    href: "/dashboard/transmissions",
     description: "Manage and create transmissions.",
   },
   {
@@ -160,6 +160,19 @@ export function DashboardNav() {
                   ))}
                 </ul>
               </NavigationMenuContent>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link href="/dashboard/users" legacyBehavior passHref>
+                <NavigationMenuLink
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    isActive("/dashboard/users") && "bg-accent text-accent-foreground"
+                  )}
+                >
+                  Users
+                </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
           </>
         )}

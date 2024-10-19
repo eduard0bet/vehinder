@@ -1,17 +1,18 @@
-// @/components/vehiclesView.tsx
 "use client"
 
 import { useEffect, useState } from "react"
-import { Eraser, RotateCcw } from "lucide-react"
+import { RotateCcw } from "lucide-react"
 
+import { toast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import {
   Pagination,
@@ -30,13 +31,17 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+import VehicleSelects from "./VehicleSelects"
+
+const apiUrl = process.env.NEXT_PUBLIC_CARFNDR_API_URL
+
+// Función para obtener vehículos
 async function fetchVehicles(
   page: number,
   limit: number,
   token: string,
   query = ""
 ) {
-  const apiUrl = process.env.NEXT_PUBLIC_CARFNDR_API_URL
   const endpoint = query
     ? `${apiUrl}/vehicleSearch?query=${encodeURIComponent(query)}`
     : `${apiUrl}/vehicleList?page=${page}&limit=${limit}`
@@ -48,10 +53,6 @@ async function fetchVehicles(
     },
   })
 
-  if (response.status === 404) {
-    return { items: [], message: "No results found" }
-  }
-
   if (!response.ok) {
     const errorDetails = await response.text()
     console.error("Fetch error details:", errorDetails)
@@ -62,17 +63,40 @@ async function fetchVehicles(
   return data
 }
 
+// Función para crear un vehículo
+async function createVehicle(
+  vehicleData: {
+    make_id: number
+    model_id: number
+    year_id: number
+    trim_id: number
+  },
+  token: string
+) {
+  const response = await fetch(`${apiUrl}/create-vehicle`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(vehicleData),
+  })
+
+  const data = await response.json()
+  return data
+}
+
 interface Vehicle {
   vehicle_id: number
-  make: string // Marca del vehículo
+  make: string
   model: string
   year: number
   trim: string
 }
 
 interface VehiclesViewProps {
-  role: string // User role
-  token: string // Authentication token
+  role: string
+  token: string
 }
 
 export default function VehiclesView({ role, token }: VehiclesViewProps) {
@@ -82,7 +106,24 @@ export default function VehiclesView({ role, token }: VehiclesViewProps) {
   const [limit] = useState(12)
   const [query, setQuery] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [errorMessageSearch, setErrorMessageSearch] = useState<string | null>(
+    null
+  )
+
+  const [selection, setSelection] = useState<{
+    yearId: number | null
+    brandId: number | null
+    modelId: number | null
+    trimId: number | null
+  }>({
+    yearId: null,
+    brandId: null,
+    modelId: null,
+    trimId: null,
+  })
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
     const getVehicles = async () => {
@@ -90,15 +131,52 @@ export default function VehiclesView({ role, token }: VehiclesViewProps) {
         const data = await fetchVehicles(currentPage, limit, token, query)
         setVehicles(data.items)
         setTotalPages(data.totalPages || 1)
-        setErrorMessage(data.items.length === 0 ? data.message : null)
+        setErrorMessageSearch(
+          data.items.length === 0 ? "No results found" : null
+        )
       } catch (error) {
         console.error("Error fetching vehicles:", error)
-        setErrorMessage("An error occurred while fetching vehicles.")
+        setErrorMessageSearch("An error occurred while fetching vehicles.")
       }
     }
 
     getVehicles()
   }, [currentPage, limit, token, query])
+
+  const handleCreateVehicle = async () => {
+    const { yearId, brandId, modelId, trimId } = selection
+    if (!yearId || !brandId || !modelId || !trimId) {
+      setErrorMessage("Please select all fields.")
+      return
+    }
+
+    try {
+      const result = await createVehicle(
+        {
+          make_id: brandId!,
+          model_id: modelId!,
+          year_id: yearId!,
+          trim_id: trimId!,
+        },
+        token
+      )
+
+      if (result.message === "Vehicle already exists") {
+        setErrorMessage("Vehicle already exists")
+      } else {
+        setErrorMessage("")
+        setIsDialogOpen(false)
+        toast({
+          description: "Vehicle successfully added.",
+        })
+        const data = await fetchVehicles(currentPage, limit, token)
+        setVehicles(data.items)
+      }
+    } catch (error) {
+      console.error("Error creating vehicle:", error)
+      setErrorMessage("Failed to create vehicle.")
+    }
+  }
 
   const handleSearch = () => {
     setQuery(searchTerm)
@@ -108,33 +186,68 @@ export default function VehiclesView({ role, token }: VehiclesViewProps) {
   const handleReset = () => {
     setSearchTerm("")
     setQuery("")
-    setErrorMessage(null)
+    setErrorMessageSearch(null)
   }
 
   return (
     <div>
-      <div className="flex gap-2">
-        <div className="mt-1 text-xl md:mr-6">
-        Vehicles
+      <div className="flex justify-between gap-2">
+        <div className="mt-1 text-xl md:mr-6">Vehicles</div>
+        <div className="basis-4/5 flex gap-2">
+          <Input
+            type="text"
+            placeholder="Search by make, model, year..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          />
+          <Button onClick={handleSearch}>Search</Button>
+          {query && (
+            <Button variant="secondary" onClick={handleReset}>
+              <RotateCcw />
+            </Button>
+          )}
         </div>
-        <Input
-          type="text"
-          placeholder="Search by make, model, year..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-        />
-        <Button onClick={handleSearch}>Search</Button>
-        {query && (
-          <Button variant="secondary" onClick={handleReset}>
-            <RotateCcw />
-          </Button>
-        )}
+        <div>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(isOpen) => {
+              setIsDialogOpen(isOpen)
+              if (!isOpen) {
+                setErrorMessage("")
+                setSelection({
+                  yearId: null,
+                  brandId: null,
+                  modelId: null,
+                  trimId: null,
+                })
+              }
+            }}
+          >
+            <DialogTrigger>
+              <Button>Add</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create Vehicle</DialogTitle>
+              </DialogHeader>
+
+              <VehicleSelects token={token} onSelectionChange={setSelection} />
+              {errorMessage && (
+                <p className="text-sm text-red-400">{errorMessage}</p>
+              )}
+
+              <DialogFooter>
+                <Button onClick={handleCreateVehicle}>Create Vehicle</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
-        {errorMessage ? (
-          <p>{errorMessage}</p>
+        {errorMessageSearch ? (
+          <p>{errorMessageSearch}</p>
         ) : (
           <Table className="mt-0 w-full">
             <TableHeader>
