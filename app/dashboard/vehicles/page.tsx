@@ -33,7 +33,7 @@ export default function VehiclesPage() {
     const token = Cookies.get("token");
 
     if (!token) {
-      router.push("/auth/login");
+      router.push("/");
       return;
     }
 
@@ -42,7 +42,7 @@ export default function VehiclesPage() {
       setRole(decoded.role);
       setToken(token);
     } else {
-      router.push("/auth/login");
+      router.push("/");
     }
   }, [router]);
 

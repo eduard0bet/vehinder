@@ -11,7 +11,7 @@ export default function LogoutButton() {
 
   const handleLogout = () => {
     logout();
-    router.push('/auth/login'); // Redirige al login
+    router.push('/'); // Redirige al login
   };
 
   return (

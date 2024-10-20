@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import ModelsView from "@/components/modelView";
+import UsersView from "@/components/usersView";
 
-export default function ModelsPage() {
+export default function UsersPage() {
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -49,5 +49,5 @@ export default function ModelsPage() {
     return null;
   }
 
-  return role === "admin" ? <ModelsView role={role} token={token} /> : null;
+  return role === "admin" ? <UsersView role={role} token={token} /> : null;
 }

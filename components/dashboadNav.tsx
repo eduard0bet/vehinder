@@ -90,16 +90,16 @@ export function DashboardNav() {
         // If token is expired or role is invalid, redirect to login
         if (!decoded.role || decoded.exp * 1000 < Date.now()) {
           Cookies.remove("token");
-          router.push("/auth/login");
+          router.push("/");
         }
       } catch {
         Cookies.remove("token");
-        router.push("/auth/login");
+        router.push("/");
       } finally {
         setIsLoading(false);
       }
     } else {
-      router.push("/auth/login");
+      router.push("/");
     }
   }, [router]);
 

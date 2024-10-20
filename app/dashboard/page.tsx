@@ -29,7 +29,7 @@ export default function Dashboard() {
 
     if (!token) {
       // Si no hay token, redirigir al login
-      router.push("/auth/login");
+      router.push("/");
     } else {
       // Decodificar el token y obtener el rol
       const decoded = decodeJWT(token);

@@ -1,16 +1,27 @@
 // components/UserNav.tsx
 "use client"
-import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
 
-import { Button } from "@/components/ui/button";
-import LogoutButton from "@/components/LogoutButton";
+import Link from "next/link"
+import { useAuth } from "@/context/AuthContext"
+
+import { Button } from "@/components/ui/button"
+import LogoutButton from "@/components/LogoutButton"
+
+import LoginForm from "./login_form"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog"
 
 export default function UserNav() {
-  const { isLoggedIn, isLoading } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth()
 
   if (isLoading) {
-    return null;
+    return null
   }
 
   return (
@@ -25,15 +36,19 @@ export default function UserNav() {
           <LogoutButton />
         </>
       ) : (
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => (window.location.href = "/auth/login")}
-          className="w-full"
-        >
-          Login
-        </Button>
+        <>
+          <Dialog>
+            <DialogTrigger>
+              <Button size="sm" variant="ghost">
+                Login
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <LoginForm />
+            </DialogContent>
+          </Dialog>
+        </>
       )}
     </div>
-  );
+  )
 }

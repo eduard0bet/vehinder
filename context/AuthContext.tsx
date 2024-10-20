@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     Cookies.remove("token");
     setIsLoggedIn(false);
-    window.location.href = "/auth/login";
+    window.location.href = "/";
   };
 
   return (

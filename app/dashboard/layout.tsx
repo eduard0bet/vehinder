@@ -19,7 +19,7 @@ export default function DashboardLayout({
 
   if (!token) {
     // Redirige al login si no hay token
-    redirect("/auth/login")
+    redirect("/")
   }
 
   return (

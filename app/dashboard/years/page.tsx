@@ -34,7 +34,7 @@ export default function YearsPage() {
     const token = Cookies.get("token");
 
     if (!token) {
-      router.push("/auth/login");
+      router.push("/");
       return;
     }
 
@@ -43,7 +43,7 @@ export default function YearsPage() {
       setRole(decoded.role);
       setToken(token);
     } else {
-      router.push("/auth/login");
+      router.push("/");
     }
   }, [router]);
 
